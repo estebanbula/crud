@@ -5,11 +5,26 @@ import shortid from 'shortid'
 function App() {
   const [task, setTask] = useState("")
   const [tasks, setTasks] = useState([])
+  const [editMode, setEditMode] = useState(false)
+  const [id, setId] = useState("")
+  const [error, setError] = useState(null)
+
+  const validForm = () => {
+    let isValid = true
+    setError(null)
+
+    if (isEmpty(task)) {
+      setError("You must add a task")
+      isValid = false
+    }
+
+    return
+  }
 
   const addTask = (e) => {
     e.preventDefault()
-    if (isEmpty(task)) {
-      console.log("Task empty")
+
+    if (!validForm()) {
       return
     }
     
@@ -22,6 +37,20 @@ function App() {
     setTask("")
   }
 
+  const saveTask = (e) => {
+    e.preventDefault()
+
+    if (!validForm()) {
+      return
+    }
+    
+    const editedTasks = tasks.map(item => item.id === id ? { id, name: task} : item)
+    setTasks(editedTasks)
+    setEditMode(false)
+    setTask("")
+    setId("")
+  }
+
   const deleteTask = (id) => {
     const filterTasks = tasks.filter(task => task.id !== id)
     setTasks(filterTasks)
@@ -29,6 +58,12 @@ function App() {
 
   const completeTask = (id) => {
     const finishTask = tasks.filter(task => task.id == id)
+  }
+
+  const editTask = (theTask) => {
+    setTask(theTask.name)
+    setEditMode(true)
+    setId(theTask.id)
   }
 
   return (  
@@ -39,8 +74,8 @@ function App() {
         <div className = "col-8"> 
           <h4 className = "text-center">Task List</h4>
           {
-            size(tasks) == 0 ? (
-              <h5 className = "text-center">Add some tasks to start</h5>
+            size(tasks) === 0 ? (
+              <li className = "list-group-item">Add some tasks to start</li>
             ) : (
             <ul className = "list-group">
               {
@@ -53,7 +88,8 @@ function App() {
                     Delete
                   </button>
                   <button 
-                    className = "btn btn-info btn-sm float-right mx-1">
+                    className = "btn btn-info btn-sm float-right mx-1"
+                    onClick = {() => editTask(task)}>
                     Edit
                   </button>
                   <button 
@@ -83,8 +119,11 @@ function App() {
             </ul>
           </div> */}
         <div className = "col-4">
-          <h4 className = "text-center">Edit Form</h4>
-          <form onSubmit = {addTask}>
+          <h4 className = "text-center">{ editMode ? "Edit task" : "Add task"}</h4>
+          <form onSubmit = { editMode ? saveTask : addTask}>
+            {
+              error && <span className = "text-danger">{error}</span>
+            }
             <input
               type = "text"
               className = "form-control mb-2"
@@ -93,9 +132,9 @@ function App() {
               value = {task}
             />
             <button
-              className = "btn btn-dark btn-block"
+              className = { editMode ? "btn btn-success btn-block" : "btn btn-dark btn-block"}
               type = "submit">
-                Add
+                { editMode ? "Save" : "Add"}
             </button>
           </form>
         </div>
