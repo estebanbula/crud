@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { isEmpty, size } from 'lodash'
 import shortid from 'shortid'
+import { getCollection } from './actions'
 
 function App() {
   const [task, setTask] = useState("")
@@ -8,6 +9,12 @@ function App() {
   const [editMode, setEditMode] = useState(false)
   const [id, setId] = useState("")
   const [error, setError] = useState(null)
+
+  useEffect(() => {
+    (async () => {
+      const result = await getCollection("tasks")
+    })()
+  }, [])
 
   const validForm = () => {
     let isValid = true
@@ -18,7 +25,7 @@ function App() {
       isValid = false
     }
 
-    return
+    return isValid
   }
 
   const addTask = (e) => {
@@ -44,7 +51,7 @@ function App() {
       return
     }
     
-    const editedTasks = tasks.map(item => item.id === id ? { id, name: task} : item)
+    const editedTasks = tasks.map(item => item.id === id ? { id, name: task } : item)
     setTasks(editedTasks)
     setEditMode(false)
     setTask("")
@@ -56,9 +63,9 @@ function App() {
     setTasks(filterTasks)
   }
 
-  const completeTask = (id) => {
-    const finishTask = tasks.filter(task => task.id == id)
-  }
+/*   const completeTask = (id) => {
+    const finishTask = tasks.filter(task => task.id === id)
+  } */
 
   const editTask = (theTask) => {
     setTask(theTask.name)
@@ -93,8 +100,7 @@ function App() {
                     Edit
                   </button>
                   <button 
-                    className = "btn btn-success btn-sm float-right"
-                    onClick = {() => completeTask(task.id)}>
+                    className = "btn btn-success btn-sm float-right">
                     Done
                   </button>
                 </li>
@@ -134,7 +140,7 @@ function App() {
             <button
               className = { editMode ? "btn btn-success btn-block" : "btn btn-dark btn-block"}
               type = "submit">
-                { editMode ? "Save" : "Add"}
+                { editMode ? "Save" : "Add" }
             </button>
           </form>
         </div>
