@@ -92,6 +92,7 @@ function App() {
 
   return (  
     <div className = "container mt-5">
+      <title>WeTask</title>
       <h1>WeTask</h1>
       <hr/>
       <div className = "row">
